@@ -1,0 +1,36 @@
+version: "3.7"
+networks:
+  camunda-net:
+    external: false
+
+services:
+  camunda:
+    image: buildouttech/camunda-webhook-history
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+    - 8080:8080
+    environment:
+      DB_DRIVER: "org.postgresql.Driver"
+      DB_URL: "jdbc:postgresql://postgres_db:5432/process_engine"
+      DB_USERNAME: "camunda"
+      DB_PASSWORD: "strongP@ssw0rd"
+      WAIT_FOR: "postgres_db:5432"
+      DEBUG: "true"
+    networks:
+      - camunda-net
+    depends_on:
+      - postgres_db
+
+
+  postgres_db:
+    image: postgres:13
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/docker_volumes/postgres_camunda/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: "strongP@ssw0rd"
+    networks:
+      - camunda-net
