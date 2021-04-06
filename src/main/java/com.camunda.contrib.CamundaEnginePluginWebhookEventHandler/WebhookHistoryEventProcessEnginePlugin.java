@@ -12,32 +12,32 @@ import org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler;
 
 public class WebhookHistoryEventProcessEnginePlugin implements ProcessEnginePlugin {
 
-	@Override
-	public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    @Override
+    public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
 
-		List<HistoryLevel> customHistoryLevels = processEngineConfiguration.getCustomHistoryLevels();
-		if (customHistoryLevels == null) {
-			customHistoryLevels = new ArrayList<HistoryLevel>();
-			processEngineConfiguration.setCustomHistoryLevels(customHistoryLevels);
-		}
-		customHistoryLevels.add(WebhookHistoryLevel.getInstance());
-
-
-		processEngineConfiguration.setHistoryEventHandler(new CompositeDbHistoryEventHandler(new WebhookHistoryEventHandler()));
+        List<HistoryLevel> customHistoryLevels = processEngineConfiguration.getCustomHistoryLevels();
+        if (customHistoryLevels == null) {
+            customHistoryLevels = new ArrayList<HistoryLevel>();
+            processEngineConfiguration.setCustomHistoryLevels(customHistoryLevels);
+        }
+        customHistoryLevels.add(WebhookHistoryLevel.getInstance());
 
 
-		//processEngineConfiguration.setHistoryEventHandler(MyCustomHistoryEventHandler.getInstance());
+        processEngineConfiguration.setHistoryEventHandler(new CompositeDbHistoryEventHandler(new WebhookHistoryEventHandler(new EnvironmentConfigFactory(), new SymmetricTokenGenerator())));
 
-	}
 
-	@Override
-	public void postInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        //processEngineConfiguration.setHistoryEventHandler(MyCustomHistoryEventHandler.getInstance());
 
-	}
+    }
 
-	@Override
-	public void postProcessEngineBuild(ProcessEngine processEngine) {
+    @Override
+    public void postInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
 
-	}
+    }
+
+    @Override
+    public void postProcessEngineBuild(ProcessEngine processEngine) {
+
+    }
 
 }

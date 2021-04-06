@@ -9,28 +9,59 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 
 public class WebhookHistoryEventHandler implements HistoryEventHandler {
 
-	private final Logger LOGGER = Logger.getLogger(WebhookHistoryEventHandler.class.getName());
+    private final Logger LOGGER = Logger.getLogger(WebhookHistoryEventHandler.class.getName());
 
-	private static final WebhookHistoryEventHandler INSTANCE = new WebhookHistoryEventHandler();
+//    private static final WebhookHistoryEventHandler INSTANCE = new WebhookHistoryEventHandler();
+//
+//    public static WebhookHistoryEventHandler getInstance() {
+//        return INSTANCE;
+//    }
 
-	public static WebhookHistoryEventHandler getInstance(){
-		return INSTANCE;
-	}
+    public WebhookHistoryConfigFactory getWebhookHistoryConfigFactory() {
+        return webhookHistoryConfigFactory;
+    }
 
-	@Override
-	public void handleEvent(HistoryEvent historyEvent) {
+    public void setWebhookHistoryConfigFactory(WebhookHistoryConfigFactory webhookHistoryConfigFactory) {
+        this.webhookHistoryConfigFactory = webhookHistoryConfigFactory;
+    }
 
-		LOGGER.info("----- HISTORY EVENT PRODUCED: "+ historyEvent.toString());
-		// TODO: this is where webook action starts
+    public WebhookHistoryConfigFactory webhookHistoryConfigFactory;
 
-	}
+    public TokenGenerator getTokenGenerator() {
+        return tokenGenerator;
+    }
 
-	@Override
-	public void handleEvents(List<HistoryEvent> historyEvents) {
-		for (HistoryEvent historyEvent : historyEvents) {
-			handleEvent(historyEvent);
-			}
-	}
+    public void setTokenGenerator(TokenGenerator tokenGenerator) {
+        this.tokenGenerator = tokenGenerator;
+    }
+
+    public TokenGenerator tokenGenerator;
+
+    public WebhookHistoryEventHandler(WebhookHistoryConfigFactory webhookHistoryConfigFactory, SymmetricTokenGenerator symmetricTokenGenerator) {
+        this.webhookHistoryConfigFactory = webhookHistoryConfigFactory;
+        this.tokenGenerator = symmetricTokenGenerator;
+    }
+
+    @Override
+    public void handleEvent(HistoryEvent historyEvent) {
+
+        //TODO: inject dependencies
+        WebhookHistoryConfig config = this.webhookHistoryConfigFactory.createConfig();
+        String token = this.tokenGenerator.generateToken(config);
+
+        //TODO: make http request
+
+        LOGGER.info("----- HISTORY EVENT PRODUCED: " + historyEvent.toString());
+        // TODO: this is where webook action starts
+
+    }
+
+    @Override
+    public void handleEvents(List<HistoryEvent> historyEvents) {
+        for (HistoryEvent historyEvent : historyEvents) {
+            handleEvent(historyEvent);
+        }
+    }
 
 
 }
