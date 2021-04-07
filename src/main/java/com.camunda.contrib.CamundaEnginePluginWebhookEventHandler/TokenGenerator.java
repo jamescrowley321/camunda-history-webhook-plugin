@@ -1,6 +1,6 @@
 package com.camunda.contrib.CamundaEnginePluginWebhookEventHandler;
 
-// TODO: implement interface and tests
+// TODO: unit tests
 public interface TokenGenerator {
-    public String generateToken(WebhookHistoryConfig config);
+    String generateToken(WebhookHistoryConfig config);
 }

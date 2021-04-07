@@ -1,8 +1,14 @@
 package com.camunda.contrib.CamundaEnginePluginWebhookEventHandler;
 
+
+import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import okhttp3.*;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 
@@ -11,29 +17,7 @@ public class WebhookHistoryEventHandler implements HistoryEventHandler {
 
     private final Logger LOGGER = Logger.getLogger(WebhookHistoryEventHandler.class.getName());
 
-//    private static final WebhookHistoryEventHandler INSTANCE = new WebhookHistoryEventHandler();
-//
-//    public static WebhookHistoryEventHandler getInstance() {
-//        return INSTANCE;
-//    }
-
-    public WebhookHistoryConfigFactory getWebhookHistoryConfigFactory() {
-        return webhookHistoryConfigFactory;
-    }
-
-    public void setWebhookHistoryConfigFactory(WebhookHistoryConfigFactory webhookHistoryConfigFactory) {
-        this.webhookHistoryConfigFactory = webhookHistoryConfigFactory;
-    }
-
     public WebhookHistoryConfigFactory webhookHistoryConfigFactory;
-
-    public TokenGenerator getTokenGenerator() {
-        return tokenGenerator;
-    }
-
-    public void setTokenGenerator(TokenGenerator tokenGenerator) {
-        this.tokenGenerator = tokenGenerator;
-    }
 
     public TokenGenerator tokenGenerator;
 
@@ -44,16 +28,35 @@ public class WebhookHistoryEventHandler implements HistoryEventHandler {
 
     @Override
     public void handleEvent(HistoryEvent historyEvent) {
-
-        //TODO: inject dependencies
         WebhookHistoryConfig config = this.webhookHistoryConfigFactory.createConfig();
         String token = this.tokenGenerator.generateToken(config);
 
-        //TODO: make http request
-
         LOGGER.info("----- HISTORY EVENT PRODUCED: " + historyEvent.toString());
-        // TODO: this is where webook action starts
+        String serializedHistoryEvent;
+        try {
+            serializedHistoryEvent = new ObjectMapper().writeValueAsString(historyEvent);
+            LOGGER.info("History Event: " + serializedHistoryEvent);
+        } catch (JsonProcessingException e) {
+            LOGGER.log(Level.SEVERE, "Serialization of history event failed");
+            return;
+        }
+        // TODO: this is where webhook action starts
+        // TODO: make some sort of singleton for the client
+        OkHttpClient client = new OkHttpClient();
 
+        RequestBody body = RequestBody.create(serializedHistoryEvent, MediaType.parse("application/json"));
+        Request request = new Request.Builder()
+                .url(config.getWebhookBaseUrl())
+                .post(body)
+                .addHeader("Authorization", "Bearer " + token)
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            LOGGER.info("----- HISTORY EVENT WEBHOOK FIRED " + response.toString());
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Webhook failed", e);
+        }
     }
 
     @Override

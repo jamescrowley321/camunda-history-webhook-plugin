@@ -1,30 +1,29 @@
 package com.camunda.contrib.CamundaEnginePluginWebhookEventHandler;
+
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.Encoder;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import javax.crypto.SecretKey;
 import java.lang.reflect.Field;
-
 import java.util.Map;
-import java.util.Random;
+import java.util.logging.Logger;
 
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-import static org.junit.Assert.*;
 
 /**
  * Test case starting an in-memory database-backed Process Engine.
  */
 public class InMemoryH2Test {
+
+    private final Logger LOGGER = Logger.getLogger(InMemoryH2Test.class.getName());
 
     @Rule
     public ProcessEngineRule rule = new ProcessEngineRule();
@@ -51,9 +50,13 @@ public class InMemoryH2Test {
     @Before
     public void setup() {
         try {
-            updateEnv("JWT_SECRET", getSigningKey());
-            updateEnv("JWT_ISSUER", "telescope");
-            updateEnv("WEBHOOK_BASE_URL", "http://localhost:8000");
+            LOGGER.info("Setting up environment");
+
+            String signingKey = getSigningKey();
+            LOGGER.info("Signing key: " + signingKey);
+            updateEnv("JWT_SECRET", signingKey);
+            updateEnv("JWT_ISSUER", "testJwtIssuer");
+            updateEnv("WEBHOOK_BASE_URL", "http://mockbin.org/bin/5d224283-51e5-4c59-b51c-9fce8f5e68d4");
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -65,8 +68,9 @@ public class InMemoryH2Test {
     @Test
     @Deployment(resources = "process.bpmn")
     public void testHappyPath() {
-        ProcessInstance processInstance = processEngine().getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
-
+        ProcessInstance processInstance = processEngine()
+                .getRuntimeService()
+                .startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
         assertThat(processInstance).task("Task_DoSomething");
 
         complete(task());

@@ -1,14 +1,13 @@
 package com.camunda.contrib.CamundaEnginePluginWebhookEventHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.handler.CompositeDbHistoryEventHandler;
-import org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class WebhookHistoryEventProcessEnginePlugin implements ProcessEnginePlugin {
 
@@ -24,10 +23,6 @@ public class WebhookHistoryEventProcessEnginePlugin implements ProcessEnginePlug
 
 
         processEngineConfiguration.setHistoryEventHandler(new CompositeDbHistoryEventHandler(new WebhookHistoryEventHandler(new EnvironmentConfigFactory(), new SymmetricTokenGenerator())));
-
-
-        //processEngineConfiguration.setHistoryEventHandler(MyCustomHistoryEventHandler.getInstance());
-
     }
 
     @Override

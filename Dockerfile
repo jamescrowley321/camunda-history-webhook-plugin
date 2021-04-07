@@ -8,5 +8,6 @@ FROM camunda/camunda-bpm-platform:7.14.0 as final
 RUN rm -r webapps/camunda-invoice
 RUN rm -r webapps/h2
 RUN rm -r webapps/examples
-
-COPY --chown=camunda:camunda --from=build /home/app/target/com.camunda.contrib.CamundaEnginePluginWebhookEventHandler-0.0.1-SNAPSHOT.jar /camunda/lib/camunda-engine-history-webhook-plugin-0.0.1-SNAPSHOT.jar
+# TODO: handle different versions of plugin
+COPY --chown=camunda:camunda --from=build /home/app/target/ /camunda/lib/
+COPY --chown=camunda:camunda bpm-platform.xml /camunda/conf/bpm-platform.xml

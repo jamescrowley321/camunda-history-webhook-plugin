@@ -24,7 +24,10 @@ public class SymmetricTokenGenerator implements TokenGenerator {
         // Let's set the JWT Claims
         // TODO: expiration and subject?
         // TODO: set subject of claim
-        JwtBuilder builder = Jwts.builder().setId("webhoohHistoryPlugin")
+        // TODO: handle JTI
+        // TODO: handle subject
+        JwtBuilder builder = Jwts.builder().setId("camundaWebhookHistoryPlugin")
+                .setSubject("camundaWebhookHistoryPlugin")
                 .setIssuedAt(now)
                 .setIssuer(config.getJwtIssuer())
                 .signWith(signingKey);

@@ -1,3 +1,5 @@
+#!/bin/bash
+# NOT FOR PRODUCTION USE!!!!
 PGPASSWORD=strongP@ssw0rd psql -h localhost -p 5432 -U postgres -c "create database process_engine"
 PGPASSWORD=strongP@ssw0rd psql -h localhost -p 5432 -U postgres -c "create user camunda with PASSWORD 'strongP@ssw0rd'"
 PGPASSWORD=strongP@ssw0rd psql -h localhost -p 5432  -U postgres -c "GRANT CONNECT ON DATABASE process_engine TO camunda;"
