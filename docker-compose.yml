@@ -5,7 +5,7 @@ networks:
 
 services:
   camunda:
-    image: buildouttech/camunda-webhook-history
+    image: buildouttech/camunda-history-webhook-plugin
     build:
       context: .
       dockerfile: Dockerfile
