@@ -2,6 +2,14 @@ name: Publish Docker image
 on:
   [push]
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate build number
+        id: buildnumber
+        uses: einaregilsson/build-number@v3
+        with:
+          token: ${{secrets.github_token}}
   push_to_registry:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
@@ -14,4 +22,4 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: buildouttech/camunda-history-webhook-plugin
-          tag_with_ref: true
+          tags: ${{ steps.buildnumber.outputs.build_number  }}
