@@ -20,7 +20,7 @@ services:
       DEBUG: "true"
       JWT_ISSUER: "docker_compose_issuer"
       JWT_SECRET: "uOeGF3qpZHDydBFpOAmtc7/GmJBQ+gTRQNXzniTC08U="
-      WEBHOOK_BASE_URL: "http://mockbin.org/bin/84636d92-2506-475c-af40-73dc0bbb6404"
+      WEBHOOK_BASE_URL: ""
     networks:
       - camunda-net
     depends_on:
