@@ -29,11 +29,12 @@ Rather than using a Sprint Boot Application like this example - https://github.c
 
 ## Configuration
 
-| Property         | Default | Description                              |
-| ---------------- | ------- | ---------------------------------------- |
-| JWT_ISSUER       |         | Issuer of the JWT for symmetric signing. |
-| JWT_SECRET       |         | Secret to use to generate the JWT.       |
-| WEBHOOK_BASE_URL |         | URL to POST history events to.           |
+| Property             | Default | Description                                                  |
+| -------------------- | ------- | ------------------------------------------------------------ |
+| JWT_ISSUER           |         | Issuer of the JWT for symmetric signing.                     |
+| JWT_SECRET           |         | Secret to use to generate the JWT.                           |
+| WEBHOOK_BASE_URL     |         | URL to POST history events to.                               |
+| WEBHOOK_ENDPOINT_MAP |         | Map of URL and taskDefinitionKeys to allow per task definition webhook URL configuration |
 
 Refer to [https://github.com/camunda/docker-camunda-bpm-platform](https://github.com/camunda/docker-camunda-bpm-platform) for Camunda specific configurations.
 

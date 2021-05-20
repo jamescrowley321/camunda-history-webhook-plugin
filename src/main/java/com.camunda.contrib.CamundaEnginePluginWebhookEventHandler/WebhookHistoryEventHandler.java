@@ -1,16 +1,19 @@
 package com.camunda.contrib.CamundaEnginePluginWebhookEventHandler;
 
 
-import java.io.IOException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
+import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class WebhookHistoryEventHandler implements HistoryEventHandler {
@@ -42,11 +45,27 @@ public class WebhookHistoryEventHandler implements HistoryEventHandler {
         }
         // TODO: this is where webhook action starts
         // TODO: make some sort of singleton for the client
+        // TODO: support different endpoints for different tasks
         OkHttpClient client = new OkHttpClient();
 
         RequestBody body = RequestBody.create(serializedHistoryEvent, MediaType.parse("application/json"));
+        AtomicReference<String> url = new AtomicReference<>("");
+
+        // TODO: make more efficient
+        if (isMappedToEventTaskDefinition(historyEvent, config)) {
+            LOGGER.info("Found getWebhookEndpointMap");
+            String taskDefinitionKey = ((HistoricTaskInstanceEventEntity) historyEvent).getTaskDefinitionKey();
+            config.getWebhookEndpointMap().forEach((k, v) -> {
+                if (Arrays.asList(v).contains(taskDefinitionKey)) {
+                    url.set(k);
+                }
+            });
+        } else {
+            LOGGER.info("Failed to find getWebhookEndpointMap");
+            url.set(config.getWebhookBaseUrl());
+        }
         Request request = new Request.Builder()
-                .url(config.getWebhookBaseUrl())
+                .url(url.get())
                 .post(body)
                 .addHeader("Authorization", "Bearer " + token)
                 .build();
@@ -57,6 +76,14 @@ public class WebhookHistoryEventHandler implements HistoryEventHandler {
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Webhook failed", e);
         }
+    }
+
+    private boolean isMappedToEventTaskDefinition(HistoryEvent historyEvent, WebhookHistoryConfig config) {
+        // TODO: find a way to check type
+        return config.getWebhookEndpointMap() != null
+                && !config.getWebhookEndpointMap().isEmpty()
+//                && historyEvent.toString().contains("taskDefinitionKey");
+                && historyEvent instanceof HistoricTaskInstanceEventEntity;
     }
 
     @Override

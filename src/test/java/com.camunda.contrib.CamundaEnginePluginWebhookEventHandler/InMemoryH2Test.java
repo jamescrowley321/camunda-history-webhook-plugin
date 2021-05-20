@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 
 /**
  * Test case starting an in-memory database-backed Process Engine.
+ * TODO: write more tests
  */
 public class InMemoryH2Test {
 
@@ -56,10 +57,9 @@ public class InMemoryH2Test {
             LOGGER.info("Signing key: " + signingKey);
             updateEnv("JWT_SECRET", signingKey);
             updateEnv("JWT_ISSUER", "testJwtIssuer");
-            updateEnv("WEBHOOK_BASE_URL", "http://mockbin.org/bin/5d224283-51e5-4c59-b51c-9fce8f5e68d4");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+            updateEnv("WEBHOOK_BASE_URL", "http://mockbin.org/bin/40100097-af54-413b-86de-8cbbdd4227b2");
+            updateEnv("WEBHOOK_ENDPOINT_MAP", "http://mockbin.org/bin/f59a535a-8e60-409f-bc69-09cdf29ace75=Task_DoSomething;");
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
         init(rule.getProcessEngine());
